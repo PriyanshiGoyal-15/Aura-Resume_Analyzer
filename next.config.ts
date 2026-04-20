@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
-      allowedOrigins: ['hxhmx1tx-3000.inc1.devtunnels.ms', 'localhost:3000'],
     },
   },
 };

@@ -8,7 +8,7 @@ export async function generateCoverLetter(resumeText: string, jobDescription: st
   if (!apiKey) throw new Error("API Key not found. Please add GEMINI_API_KEY to .env.local");
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `
     Act as a professional career coach. Write a high-conversion, professional cover letter based on the following resume and job description.
@@ -39,11 +39,12 @@ export async function generateCoverLetter(resumeText: string, jobDescription: st
     const responseText = result.response.text();
     console.log("✅ Cover Letter Generated:", responseText);
     return responseText;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.warn("AI Cover Letter failed:", error);
 
     // Check for explicit API key issues
-    const isApiKeyError = error?.message?.toLowerCase().includes("api key") || error?.message?.toLowerCase().includes("expired");
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isApiKeyError = errorMessage.toLowerCase().includes("api key") || errorMessage.toLowerCase().includes("expired");
 
     if (isApiKeyError) {
       const fallbackMsg = `# Professional Career Brief (Intelligent Protocol)
@@ -146,7 +147,7 @@ export async function generateATSOptimization(resumeText: string, jobDescription
   if (!apiKey) throw new Error("API Key not found. Please add GEMINI_API_KEY to .env.local");
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `
     Act as an ATS (Applicant Tracking System) Expert. 
@@ -181,11 +182,12 @@ export async function generateATSOptimization(resumeText: string, jobDescription
     const responseText = result.response.text();
     console.log("✅ ATS Optimization Response:", responseText);
     return responseText;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.warn("AI ATS Optimization failed:", error);
 
     // Check for explicit API key issues
-    const isApiKeyError = error?.message?.toLowerCase().includes("api key") || error?.message?.toLowerCase().includes("expired");
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isApiKeyError = errorMessage.toLowerCase().includes("api key") || errorMessage.toLowerCase().includes("expired");
 
     if (isApiKeyError) {
       const fallbackMsg = `### ⚠️ Configuration Error: API Key expired

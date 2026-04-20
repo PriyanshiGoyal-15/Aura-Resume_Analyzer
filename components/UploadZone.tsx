@@ -25,7 +25,7 @@ export default function UploadZone({ onUpload, isAnalyzing }: UploadZoneProps) {
     setIsDragging(false);
   }, []);
 
-  const validateAndUpload = (file: File, jd: string) => {
+  const validateAndUpload = useCallback((file: File, jd: string) => {
     if (file.type !== "application/pdf") {
       setError("Please upload a PDF file.");
       return;
@@ -36,14 +36,14 @@ export default function UploadZone({ onUpload, isAnalyzing }: UploadZoneProps) {
     }
     setError(null);
     onUpload(file, jd);
-  };
+  }, [onUpload]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (file) validateAndUpload(file, jobDescription);
-  }, [onUpload, jobDescription]);
+  }, [validateAndUpload, jobDescription]);
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">

@@ -14,14 +14,14 @@ export async function withRetry<T>(
   maxAttempts = 3,
   delay = 1000
 ): Promise<T> {
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
-    } catch (error: any) {
+    } catch (error: unknown) {
       lastError = error;
-      const errorMessage = error?.message || "";
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
       // Specifically target 503 Service Unavailable (High Demand) or 429 (Quota)
       const is503 = errorMessage.includes("503") || errorMessage.includes("Service Unavailable");

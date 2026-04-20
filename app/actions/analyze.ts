@@ -1,12 +1,43 @@
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { PDFParse } from "pdf-parse";
 import { withRetry } from "@/lib/ai-utils";
-
-// Configure PDF worker for Next.js server environment using local file
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import path from "path";
-PDFParse.setWorker(path.join(process.cwd(), "public", "pdf.worker.mjs"));
+
+// Function to extract text from PDF using pdfjs-dist
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  const data = new Uint8Array(buffer);
+  
+  // Set worker for Node environment
+  try {
+    const workerPath = path.join(process.cwd(), "node_modules", "pdfjs-dist", "legacy", "build", "pdf.worker.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc = workerPath;
+  } catch (e) {
+    console.warn("Could not set PDF worker path, attempting without worker:", e);
+  }
+
+  const loadingTask = pdfjs.getDocument({
+    data,
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    useSystemFonts: true
+  });
+
+  const pdf = await loadingTask.promise;
+  let fullText = "";
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item) => (item as { str: string }).str)
+      .join(" ");
+    fullText += pageText + "\n";
+  }
+
+  return fullText;
+}
 
 export type AnalysisResult = {
   score: number;
@@ -71,11 +102,9 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
   if (!file) throw new Error("No file uploaded");
 
   const buffer = Buffer.from(await file.arrayBuffer());
+  const text = await extractTextFromPDF(buffer);
 
   try {
-    const parser = new PDFParse({ data: buffer });
-    const data = await parser.getText();
-    const text = data.text;
     const textLower = text.toLowerCase();
 
     // Check for API Key

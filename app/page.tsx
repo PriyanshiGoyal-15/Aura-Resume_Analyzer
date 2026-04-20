@@ -18,7 +18,8 @@ import {
   TrendingUp,
   ArrowRight,
   AlertTriangle,
-  HelpCircle
+  HelpCircle,
+  LucideIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -50,7 +51,7 @@ const FEATURES = [
   }
 ];
 
-const CATEGORY_ICONS: Record<string, any> = {
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
   contact: UserCircle,
   sections: Layout,
   skills: Cpu,
@@ -119,14 +120,15 @@ export default function Home() {
       const output = await analyzeResume(formData);
       setResult(output);
       setActiveTab("analysis");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      const isQuota = error?.message?.includes("429") || error?.message?.includes("Quota") || error?.message?.includes("Throttled");
-      const isTechnicalLog = error?.message?.includes("GoogleGenerativeAI") || error?.message?.includes("models/gemini");
+      const errorMessage = error instanceof Error ? error.message : "";
+      const isQuota = errorMessage.includes("429") || errorMessage.includes("Quota");
+      const isTechnicalLog = errorMessage.includes("GoogleGenerativeAI") || errorMessage.includes("models/gemini");
 
       setModalTitle(isQuota ? "System Throttled" : "Diagnostic Failure");
 
-      let finalMsg = error?.message || "Failed to analyze resume. Please verify the file and try again.";
+      let finalMsg = errorMessage || "Failed to analyze resume. Please verify the file and try again.";
       if (isTechnicalLog && isQuota) {
         finalMsg = "Daily Neural Limit Reached: Your current quota for the free diagnostic tier (20 scans/day) has been exhausted. Please wait until tomorrow for a fresh reset.";
       }
@@ -146,14 +148,15 @@ export default function Home() {
     try {
       const content = await generateATSOptimization(result.rawText, jobContext);
       setModalContent(content);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      const isQuota = error?.message?.includes("429") || error?.message?.includes("Quota");
-      const isTechnicalLog = error?.message?.includes("GoogleGenerativeAI") || error?.message?.includes("models/gemini");
+      const errorMessage = error instanceof Error ? error.message : "";
+      const isQuota = errorMessage.includes("429") || errorMessage.includes("Quota");
+      const isTechnicalLog = errorMessage.includes("GoogleGenerativeAI") || errorMessage.includes("models/gemini");
 
       setModalTitle(isQuota ? "System Throttled" : "Neural Link Failure");
 
-      let finalMsg = error?.message || "Failed to optimize. Please check your network and try again.";
+      let finalMsg = errorMessage || "Failed to check result. Please check your network and try again.";
       if (isTechnicalLog && isQuota) {
         finalMsg = "High Neural Demand: The AI engine is currently throttled due to heavy traffic. Please wait a minute before retrying.";
       }
@@ -172,14 +175,15 @@ export default function Home() {
     try {
       const content = await generateCoverLetter(result.rawText, jobContext);
       setModalContent(content);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      const isQuota = error?.message?.includes("429") || error?.message?.includes("Quota");
-      const isTechnicalLog = error?.message?.includes("GoogleGenerativeAI") || error?.message?.includes("models/gemini");
+      const errorMessage = error instanceof Error ? error.message : "";
+      const isQuota = errorMessage.includes("429") || errorMessage.includes("Quota");
+      const isTechnicalLog = errorMessage.includes("GoogleGenerativeAI") || errorMessage.includes("models/gemini");
 
       setModalTitle(isQuota ? "System Throttled" : "Neural Link Failure");
 
-      let finalMsg = error?.message || "Failed to generate cover letter. Please check your network and try again.";
+      let finalMsg = errorMessage || "Failed to generate cover letter. Please check your network and try again.";
       if (isTechnicalLog && isQuota) {
         finalMsg = "High Neural Demand: The AI engine is currently throttled due to heavy traffic. Please wait a minute before retrying.";
       }
@@ -432,7 +436,7 @@ export default function Home() {
                         className="p-6 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-default"
                       >
                         <p className="text-sm font-medium text-slate-300 leading-relaxed italic">
-                          "{question}"
+                          &quot;{question}&quot;
                         </p>
                       </motion.div>
                     ))}
@@ -508,7 +512,7 @@ export default function Home() {
             <div className="space-y-4 max-w-md">
               <h2 className="text-3xl font-black text-white tracking-tighter">Diagnostic Required</h2>
               <p className="text-slate-400 font-medium leading-relaxed">
-                We haven't received your data matrix yet. Please transmit your resume on the
+                We haven&apos;t received your data matrix yet. Please transmit your resume on the
                 <button
                   onClick={() => setActiveTab("dashboard")}
                   className="text-indigo-400 font-black hover:text-indigo-300 transition-colors mx-1 underline decoration-2 underline-offset-4"
@@ -529,7 +533,7 @@ export default function Home() {
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">{activeTab} Coming Soon</h2>
-              <p className="text-slate-500 font-medium"> We're building a smarter way to manage your career assets. </p>
+              <p className="text-slate-500 font-medium"> We&apos;re building a smarter way to manage your career assets. </p>
             </div>
           </div>
         )}
