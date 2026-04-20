@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-primary: #6366f1;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #a855f7;
+  --color-accent: #f43f5e;
+  --color-card: rgba(15,23,42,0.8);
+  --color-border: rgba(255,255,255,0.05);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --animate-pulse-slow: pulse-slow 15s ease-in-out infinite;
+  --animate-scan: scan 3s linear infinite;
+  --animate-shimmer: shimmer 2s infinite;
+
+  @keyframes pulse-slow {
+    0%, 100% { transform: scale(1) translate(0,0); opacity: 0.1; }
+    50% { transform: scale(1.1) translate(10px,-10px); opacity: 0.2; }
+  }
+
+  @keyframes scan {
+    0% { transform: translateY(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 }
 
+:root {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+}
+
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter, 'Inter', system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-xl bg-slate-900/60 border border-white/10 shadow-2xl;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-2xl bg-slate-900/40 border border-white/5 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)];
+  }
+
+  .glass-glow {
+    @apply relative after:absolute after:inset-0 after:rounded-[inherit] after:shadow-[0_0_40px_rgba(99,102,241,0.1)] after:pointer-events-none;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400;
+  }
+
+  .btn-premium {
+    @apply relative px-8 py-4 bg-white text-slate-950 rounded-2xl font-black transition-all duration-500 shadow-[0_20px_40px_rgba(255,255,255,0.1)] active:scale-95 overflow-hidden;
+  }
+
+  .nebula-blob {
+    @apply absolute rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-pulse-slow;
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.1);
 }
