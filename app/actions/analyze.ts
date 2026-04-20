@@ -9,15 +9,16 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   // Dynamically import pdfjs-dist to avoid module-level issues on Vercel
   // Using the legacy build for better Node.js/Serverless compatibility
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  
+
   const data = new Uint8Array(buffer);
-  
+
   // Set worker specifically for the environment. 
-  // On Vercel, we attempt to use the worker from the local node_modules path
-  // but wrap it in a try-catch to allow fallback if the filesystem is protected.
+  // We avoid 'node_modules' paths which fail on Vercel. 
+  // Instead, we let pdfjs use its built-in legacy worker if no src is set,
+  // or we catch the error to prevent a hard process crash.
   try {
-    const workerPath = path.join(process.cwd(), "node_modules", "pdfjs-dist", "legacy", "build", "pdf.worker.mjs");
-    pdfjs.GlobalWorkerOptions.workerSrc = workerPath;
+    // Attempting to set to a static path, but with a robust fallback
+    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
   } catch (e) {
     console.warn("Could not set PDF worker path, attempting without worker:", e);
   }
@@ -71,6 +72,8 @@ export type AnalysisResult = {
   interviewQuestions: string[]; // New: Preparation intelligence
   isNeural: boolean;          // New: Indicates if AI was successfully used
   rawText: string;
+  success?: boolean;          // Indicates if the overall process succeeded
+  error?: string;             // Specific error message for UI unmasking
 };
 
 export type DiagnosticState = "pass" | "fail" | "partial";
@@ -102,26 +105,27 @@ const ESSENTIAL_SECTIONS = [
 ];
 
 export async function analyzeResume(formData: FormData): Promise<AnalysisResult> {
-  const file = formData.get("resume") as File;
-  const jobDescription = formData.get("jobDescription") as string || "";
-  if (!file) throw new Error("No file uploaded");
+  try {
+    const file = formData.get("resume") as File;
+    const jobDescription = formData.get("jobDescription") as string || "";
+    if (!file) {
+      return { success: false, error: "No file uploaded", score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
+    }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  
+
   let text = "";
   try {
     text = await extractTextFromPDF(buffer);
     if (!text || text.trim().length === 0) {
-      throw new Error("Text extraction yielded an empty data matrix.");
+      return { success: false, error: "Parser delivered empty data. The PDF might be password-protected.", score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
     }
   } catch (parseErr: unknown) {
     const error = parseErr as Error;
-    console.error("PDF extraction error:", error);
-    // Returning a descriptive error that survives Next.js server-client serialization
-    throw new Error(`DIAGNOSTIC_FAILURE (PDF_PARSER): ${error.message}`);
+    console.error("PDF Parsing Failure:", error);
+    return { success: false, error: `PARSER_FAILURE: ${error.message}`, score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
   }
 
-  try {
     const textLower = text.toLowerCase();
 
     // Check for API Key
@@ -217,7 +221,7 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
           }
         }
 
-        return { ...parsed, isNeural: true, rawText: text, weaknesses: parsed.weaknesses || [], interviewQuestions: parsed.interviewQuestions || [] } as AnalysisResult;
+        return { ...parsed, success: true, isNeural: true, rawText: text, weaknesses: parsed.weaknesses || [], interviewQuestions: parsed.interviewQuestions || [] } as AnalysisResult;
       } catch (aiError) {
         console.error("AI Analysis failed, falling back to rule-based:", aiError);
       }
@@ -413,11 +417,17 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
         `What is your specific philosophy on 'Zero-Downtime' deployments for a stack like ${techDetected.slice(0, 2).join("/") || "your current one"}?`
       ],
       isNeural: false,
-      rawText: text
+      rawText: text,
+      success: true
     };
 
-  } catch (error) {
-    console.error("Analysis error:", error);
-    throw new Error("Failed to parse resume. Ensure it's a valid PDF.");
+  } catch (error: unknown) {
+    console.error("Global Analysis error:", error);
+    const err = error as Error;
+    return { 
+      success: false, 
+      error: `SYSTEM_CRITICAL_FAILURE: ${err.message}`,
+      score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" 
+    };
   }
 }
