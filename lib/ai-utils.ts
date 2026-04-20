@@ -49,7 +49,7 @@ export async function withRetry<T>(
           delay *= 2; // Exponential backoff for fallback
           continue;
         }
-        
+
         // If we've run out of attempts, throw a high-demand friendly error
         if (is429) {
           throw new Error("High Neural Demand: The AI engine is currently throttled due to heavy traffic. Please wait a minute before retrying.");

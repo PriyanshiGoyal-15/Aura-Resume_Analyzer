@@ -88,3 +88,45 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.1);
 }
+
+/* Responsive Markdown Tables */
+.prose table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.prose table::-webkit-scrollbar {
+  height: 4px;
+}
+
+.prose table::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 10px;
+}
+
+.prose th {
+  text-align: left;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  padding: 1rem !important;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.prose td {
+  padding: 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile-Specific Refinements */
+@media (max-width: 640px) {
+  .prose {
+    font-size: 0.9rem !important;
+  }
+}

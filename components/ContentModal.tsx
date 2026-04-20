@@ -39,7 +39,7 @@ export default function ContentModal({ isOpen, onClose, title, content, loading 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 lg:p-12 overflow-hidden">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 sm:p-4 lg:p-12 overflow-hidden">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -52,43 +52,43 @@ export default function ContentModal({ isOpen, onClose, title, content, loading 
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
-            className="relative w-full max-w-5xl max-h-[90vh] bg-slate-900/40 backdrop-blur-2xl rounded-[3rem] shadow-2xl flex flex-col overflow-hidden border border-white/10"
+            className="relative w-full max-w-5xl max-h-[95vh] sm:max-h-[90vh] bg-slate-900/40 backdrop-blur-2xl rounded-[1.5rem] sm:rounded-[2.5rem] lg:rounded-[3rem] shadow-2xl flex flex-col overflow-hidden border border-white/10"
           >
             {/* Cyber-Premium Header */}
-            <div className="p-8 md:p-10 border-b border-white/5 flex items-center justify-between bg-slate-900/40 relative z-10">
-              <div className="flex items-center gap-6">
+            <div className="p-6 md:p-10 border-b border-white/5 flex items-center justify-between bg-slate-900/40 relative z-10">
+              <div className="flex items-center gap-3 sm:gap-6">
                 <div className={cn(
-                  "w-14 h-14 rounded-2xl flex items-center justify-center border shadow-lg transition-colors",
+                  "w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center border shadow-lg transition-colors shrink-0",
                   isError ? "bg-rose-500/10 text-rose-400 border-rose-500/20" : "bg-indigo-600/10 text-indigo-400 border-indigo-500/20"
                 )}>
-                  {isError ? <AlertCircle size={28} className="animate-pulse" /> : <FileSearch size={28} />}
+                  {isError ? <AlertCircle size={20} className="sm:size-7 animate-pulse" /> : <FileSearch size={20} className="sm:size-7" />}
                 </div>
-                <div>
-                  <h3 className={cn("text-2xl md:text-3xl font-black tracking-tight", isError ? "text-rose-400" : "text-white")}>{title}</h3>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-1.5">Neural Generation Output</p>
+                <div className="overflow-hidden">
+                  <h3 className={cn("text-lg sm:text-2xl md:text-3xl font-black tracking-tight truncate", isError ? "text-rose-400" : "text-white")}>{title}</h3>
+                  <p className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] sm:tracking-[0.3em] mt-0.5 sm:mt-1.5">Neural Generation Output</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="w-12 h-12 rounded-2xl hover:bg-white/5 flex items-center justify-center text-slate-500 transition-all hover:text-white hover:rotate-90 duration-300"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl hover:bg-white/5 flex items-center justify-center text-slate-500 transition-all hover:text-white hover:rotate-90 duration-300 shrink-0"
               >
-                <X size={24} />
+                <X size={20} className="sm:size-6" />
               </button>
             </div>
 
             {/* Scrollable Content Body */}
-            <div className="flex-1 overflow-y-auto p-10 md:p-16 custom-scrollbar bg-slate-950/20">
+            <div className="flex-1 overflow-y-auto p-6 sm:p-10 md:p-16 custom-scrollbar bg-slate-950/20">
               {loading ? (
-                <div className="h-96 flex flex-col items-center justify-center space-y-8">
+                <div className="h-48 sm:h-96 flex flex-col items-center justify-center space-y-6 sm:space-y-8">
                   <div className="relative">
-                    <div className="w-20 h-20 border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin" />
+                    <div className="w-12 h-12 sm:w-20 sm:h-20 border-3 sm:border-4 border-indigo-500/10 border-t-indigo-500 rounded-full animate-spin" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-10 h-10 bg-indigo-500/10 rounded-full animate-pulse" />
+                      <div className="w-6 h-6 sm:w-10 sm:h-10 bg-indigo-500/10 rounded-full animate-pulse" />
                     </div>
                   </div>
-                  <div className="text-center space-y-4 max-w-sm">
-                    <p className="text-xl font-black text-white tracking-tight">Intelligence Matrix Active</p>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] animate-pulse">Syncing neural patterns...</p>
+                  <div className="text-center space-y-2 sm:space-y-4 max-w-sm px-4">
+                    <p className="text-lg sm:text-xl font-black text-white tracking-tight">Intelligence Matrix Active</p>
+                    <p className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.1em] sm:tracking-[0.2em] animate-pulse">Syncing neural patterns...</p>
                   </div>
                 </div>
               ) : (
@@ -96,7 +96,7 @@ export default function ContentModal({ isOpen, onClose, title, content, loading 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className={cn(
-                    "prose prose-invert prose-lg lg:prose-xl max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-p:leading-relaxed prose-strong:font-black prose-hr:border-white/5",
+                    "prose prose-invert prose-sm sm:prose-lg lg:prose-xl max-w-none prose-headings:font-black prose-headings:tracking-tighter prose-p:leading-relaxed prose-strong:font-black prose-hr:border-white/5",
                     isError ? "prose-p:text-rose-200/60" : "prose-headings:text-white prose-p:text-slate-400 prose-strong:text-indigo-400"
                   )}
                 >
@@ -108,38 +108,38 @@ export default function ContentModal({ isOpen, onClose, title, content, loading 
             </div>
 
             {/* Premium Footer Actions */}
-            <div className="p-8 md:p-10 bg-slate-900/40 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/5 relative z-10">
-              <div className="flex items-center gap-3 text-slate-500">
-                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]", isError ? "bg-rose-500" : "bg-emerald-500")} />
-                <span className="text-[10px] font-black uppercase tracking-widest">{isError ? "System Throttle Warning" : "Document Integrity Verified"}</span>
+            <div className="p-6 sm:p-8 md:p-10 bg-slate-900/40 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 border-t border-white/5 relative z-10">
+              <div className="flex items-center gap-3 text-slate-500 w-full sm:w-auto">
+                <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)] shrink-0", isError ? "bg-rose-500" : "bg-emerald-500")} />
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest">{isError ? "System Throttle Warning" : "Document Integrity Verified"}</span>
               </div>
-              <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
                 {!isError ? (
                   <>
                     <button
                       onClick={handleDownload}
                       disabled={loading || !content}
-                      className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-8 py-4 rounded-[1.25rem] font-black text-slate-400 bg-white/5 hover:bg-white/10 border border-white/10 transition-all disabled:opacity-50"
+                      className="w-full sm:w-auto flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-[1.25rem] font-black text-slate-400 bg-white/5 hover:bg-white/10 border border-white/10 transition-all disabled:opacity-50 text-xs sm:text-sm"
                     >
-                      <Download size={18} />
+                      <Download size={16} className="sm:size-[18px]" />
                       Download (.md)
                     </button>
                     <button
                       onClick={handleCopy}
                       disabled={loading || !content}
                       className={cn(
-                        "flex-1 sm:flex-none flex items-center justify-center gap-3 px-10 py-4 rounded-[1.25rem] font-black transition-all shadow-2xl disabled:opacity-50",
+                        "w-full sm:w-auto flex items-center justify-center gap-3 px-8 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-[1.25rem] font-black transition-all shadow-2xl disabled:opacity-50 text-xs sm:text-sm",
                         copied ? "bg-emerald-500 text-white shadow-emerald-500/20" : "bg-white text-slate-950 hover:scale-[1.02] active:scale-[0.98]"
                       )}
                     >
-                      {copied ? <Check size={18} /> : <Copy size={18} />}
+                      {copied ? <Check size={16} className="sm:size-[18px]" /> : <Copy size={16} className="sm:size-[18px]" />}
                       {copied ? "Copied" : "Copy Content"}
                     </button>
                   </>
                 ) : (
                   <button
                     onClick={onClose}
-                    className="w-full sm:w-auto px-12 py-4 rounded-[1.25rem] font-black bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    className="w-full sm:w-auto px-10 sm:px-12 py-3 sm:py-4 rounded-xl sm:rounded-[1.25rem] font-black bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-xs sm:text-sm"
                   >
                     Close Neural Link
                   </button>

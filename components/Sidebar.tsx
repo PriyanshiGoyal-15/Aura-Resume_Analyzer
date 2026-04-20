@@ -59,7 +59,7 @@ export default function Sidebar({
       </AnimatePresence>
 
       <aside className={cn(
-        "fixed inset-y-0 left-0 w-[300px] sm:w-[320px] transition-transform duration-500 z-[101] lg:relative lg:translate-x-0 lg:z-40 lg:h-screen lg:sticky lg:top-0 h-full",
+        "fixed inset-y-0 left-0 w-80 max-w-[85vw] transition-transform duration-500 z-[101] lg:relative lg:translate-x-0 lg:z-40 lg:h-screen lg:sticky lg:top-0 h-full",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="h-full lg:h-[calc(100vh-3rem)] m-0 lg:m-6 lg:rounded-[2.5rem] bg-slate-900 lg:bg-slate-900/60 backdrop-blur-2xl border-r lg:border border-white/5 flex flex-col shadow-2xl relative overflow-hidden group">

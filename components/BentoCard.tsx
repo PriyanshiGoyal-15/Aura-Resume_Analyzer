@@ -66,14 +66,14 @@ export default function BentoCard({
   const offset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
 
   return (
-    <div className="glass-card p-6 md:p-10 flex flex-col h-full group hover:bg-slate-900/60 transition-all duration-500 hover:translate-y-[-4px] relative overflow-hidden rounded-[2.5rem]">
+    <div className="glass-card p-6 sm:p-8 lg:p-10 flex flex-col h-full group hover:bg-slate-900/60 transition-all duration-500 hover:translate-y-[-4px] relative overflow-hidden rounded-[2.5rem]">
       {/* Animated Scanline */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent h-[100px] w-full -translate-y-full group-hover:animate-scan pointer-events-none" />
 
       {/* Top Header Layer */}
-      <div className="flex items-start justify-between mb-8 lg:mb-10 relative z-10">
+      <div className="flex items-start justify-between mb-6 sm:mb-8 lg:mb-10 relative z-10">
         <div className={cn(
-          "w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center border transition-all duration-500",
+          "w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center border transition-all duration-500 shrink-0",
           getThemeColor()
         )}>
           <Icon size={22} className="lg:size-[26px]" />
@@ -81,55 +81,30 @@ export default function BentoCard({
 
         <div className="flex flex-col items-end gap-2">
           <div className="relative w-12 h-12 lg:w-14 lg:h-14 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="24"
-                cy="24"
-                r="18"
-                className="stroke-white/5 lg:hidden"
-                strokeWidth="3"
-                fill="transparent"
-              />
+            <svg viewBox="0 0 56 56" className="w-full h-full transform -rotate-90">
               <circle
                 cx="28"
                 cy="28"
-                r={RADIUS}
-                className="stroke-white/5 hidden lg:block"
-                strokeWidth="3.5"
+                r="24"
+                className="stroke-white/5"
+                strokeWidth="4"
                 fill="transparent"
-              />
-              <motion.circle
-                cx="24"
-                cy="24"
-                r="18"
-                className={cn("lg:hidden transition-colors duration-500",
-                  status === 'success' ? "stroke-emerald-400" :
-                    status === 'warning' ? "stroke-amber-400" :
-                      "stroke-rose-400"
-                )}
-                strokeWidth="3"
-                fill="transparent"
-                strokeLinecap="round"
-                initial={{ strokeDasharray: 2 * Math.PI * 18 }}
-                animate={{ strokeDashoffset: (2 * Math.PI * 18) - (score / 100) * (2 * Math.PI * 18) }}
-                style={{ strokeDasharray: 2 * Math.PI * 18 }}
-                transition={{ duration: 2 }}
               />
               <motion.circle
                 cx="28"
                 cy="28"
-                r={RADIUS}
-                className={cn("hidden lg:block transition-colors duration-500",
+                r="24"
+                className={cn("transition-colors duration-500",
                   status === 'success' ? "stroke-emerald-400" :
                     status === 'warning' ? "stroke-amber-400" :
                       "stroke-rose-400"
                 )}
-                strokeWidth="3.5"
+                strokeWidth="4"
                 fill="transparent"
                 strokeLinecap="round"
-                initial={{ strokeDasharray: CIRCUMFERENCE }}
-                animate={{ strokeDashoffset: offset }}
-                style={{ strokeDasharray: CIRCUMFERENCE }}
+                initial={{ strokeDasharray: 2 * Math.PI * 24 }}
+                animate={{ strokeDashoffset: (2 * Math.PI * 24) - (score / 100) * (2 * Math.PI * 24) }}
+                style={{ strokeDasharray: 2 * Math.PI * 24 }}
                 transition={{ duration: 2 }}
               />
             </svg>

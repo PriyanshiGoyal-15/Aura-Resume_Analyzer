@@ -27,7 +27,7 @@ export default function DashboardShell({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#020617] text-slate-50 relative overflow-hidden">
+    <div className="flex h-[100dvh] bg-[#020617] text-slate-50 relative overflow-hidden">
       {/* Background Aurora Effects */}
       <div className="nebula-blob w-[500px] h-[500px] bg-indigo-600/20 top-[-100px] right-[-100px]" />
       <div className="nebula-blob w-[400px] h-[400px] bg-violet-600/20 bottom-[-50px] left-[-100px]" />
@@ -46,19 +46,19 @@ export default function DashboardShell({
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Cyber-Premium Floating Header */}
         <header className="h-[60px] sm:h-[70px] lg:h-[90px] px-4 sm:px-6 lg:px-12 flex items-center justify-between sticky top-0 bg-slate-900/40 backdrop-blur-xl border-b border-white/5 z-20">
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
+              className="lg:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors shrink-0"
             >
               <Menu size={18} className="sm:size-5" />
             </button>
-            <div className="flex flex-col">
+            <div className="flex flex-col overflow-hidden">
               <div className="flex items-center gap-2 lg:gap-3">
-                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 lg:w-2 lg:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
-                <h1 className="text-[11px] sm:text-sm lg:text-xl font-black text-white tracking-tighter uppercase truncate max-w-[120px] sm:max-w-none">Neural Audit Terminal</h1>
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 lg:w-2 lg:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)] shrink-0" />
+                <h1 className="text-[10px] sm:text-sm lg:text-xl font-black text-white tracking-tighter uppercase truncate">Neural Audit Terminal</h1>
               </div>
-              <p className="text-[7px] sm:text-[8px] lg:text-[10px] font-black text-slate-500 uppercase tracking-[0.1em] sm:tracking-[0.2em] lg:tracking-[0.3em] mt-0.5 lg:mt-1.5 lg:ml-5 whitespace-nowrap">
+              <p className="text-[7px] sm:text-[8px] lg:text-[10px] font-black text-slate-500 uppercase tracking-[0.1em] sm:tracking-[0.2em] lg:tracking-[0.3em] mt-0.5 lg:mt-1.5 lg:ml-5 whitespace-nowrap truncate">
                 Sync: Active • Precision Intelligence
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function DashboardShell({
 
         {/* Scalable Workspace Area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="max-w-[1400px] mx-auto p-4 sm:p-8 md:p-12 lg:p-20">
+          <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-12">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}

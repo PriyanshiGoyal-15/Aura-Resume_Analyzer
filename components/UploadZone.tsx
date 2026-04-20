@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Upload, FileText, X, AlertCircle } from "lucide-react";
+import { Upload, FileText, X, AlertCircle, FileSearch } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -48,25 +48,31 @@ export default function UploadZone({ onUpload, isAnalyzing }: UploadZoneProps) {
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
       {/* Job Context Section */}
-      {/* <motion.div 
+      <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card p-8 space-y-4"
+        className="relative group group/jd"
       >
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-blue-600">
-            <FileText size={18} />
+        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-violet-500/20 rounded-3xl blur-xl opacity-0 group-hover/jd:opacity-100 transition duration-500 pointer-events-none" />
+        <div className="relative bg-slate-900/40 border border-white/5 backdrop-blur-xl rounded-3xl p-6 lg:p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                <FileSearch size={18} />
+              </div>
+              <h3 className="text-sm font-black text-white uppercase tracking-widest">Neural Context</h3>
+            </div>
+            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest bg-white/5 px-2 py-1 rounded border border-white/5">Optional Optimization</span>
           </div>
-          <h3 className="text-xl font-bold text-slate-900">Target Role Context</h3>
+          <textarea
+            placeholder="Paste target job description or role requirements here to calibrate the audit matrix..."
+            className="w-full h-32 p-4 rounded-2xl bg-white/[0.03] border border-white/5 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 transition-all resize-none text-slate-300 text-sm sm:text-base font-medium outline-none placeholder:text-slate-600"
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            disabled={isAnalyzing}
+          />
         </div>
-        <textarea
-          placeholder="Paste the Job Description or Target Role here (Optional, but highly recommended for ATS analysis)..."
-          className="w-full h-32 p-4 rounded-2xl bg-slate-50 border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all resize-none text-slate-700 font-medium outline-none"
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          disabled={isAnalyzing}
-        />
-      </motion.div> */}
+      </motion.div>
 
       <motion.div
         onDragOver={handleDragOver}

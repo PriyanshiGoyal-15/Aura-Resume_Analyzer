@@ -43,7 +43,7 @@ export default function ProcessManifest() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: idx * 0.1 }}
-            className="glass-card p-8 lg:p-10 bg-slate-900/40 border-white/5 relative group overflow-hidden rounded-[2rem]"
+            className="glass-card p-6 sm:p-8 lg:p-10 bg-slate-900/40 border-white/5 relative group overflow-hidden rounded-[2rem]"
           >
             {/* Background Glow */}
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${step.color} blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity`} />
@@ -72,7 +72,7 @@ export default function ProcessManifest() {
       </div>
       
       {/* Visual Lore Connector */}
-      <div className="p-8 glass bg-indigo-500/5 border-indigo-500/10 rounded-[2rem] flex flex-col md:flex-row items-center gap-6 justify-between">
+      <div className="p-6 sm:p-8 glass bg-indigo-500/5 border-indigo-500/10 rounded-[2rem] flex flex-col md:flex-row items-center gap-6 justify-between">
         <div className="flex items-center gap-4">
            <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400">
               <Search size={20} />

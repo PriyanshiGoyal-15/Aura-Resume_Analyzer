@@ -16,7 +16,9 @@ import {
   Clock,
   SearchCode,
   TrendingUp,
-  ArrowRight
+  ArrowRight,
+  AlertTriangle,
+  HelpCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -230,7 +232,7 @@ export default function Home() {
                   <div className="h-px w-12 lg:w-20 bg-gradient-to-r from-indigo-500/50 to-transparent" />
                 </div>
 
-                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-white tracking-tighter leading-[1.1] lg:leading-[0.9] group">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white tracking-tighter leading-[1.1] lg:leading-[0.9] group">
                   Elevate Your <br className="hidden sm:block" />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400">Career Signal</span>
                 </h1>
@@ -267,7 +269,7 @@ export default function Home() {
                         {item.icon}
                       </div>
                       <h3 className="text-base sm:text-lg lg:text-xl font-black text-white mb-2 lg:mb-3 tracking-tight">{item.title}</h3>
-                      <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">{item.desc}</p>
+                      <p className="text-sm sm:text-sm text-slate-500 font-medium leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -283,7 +285,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-16"
           >
-            <div className="bg-slate-900 rounded-[2.5rem] p-12 text-white relative overflow-hidden group">
+            <div className="bg-slate-900 rounded-[2.5rem] p-6 sm:p-10 lg:p-12 text-white relative overflow-hidden group">
               <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -308,7 +310,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="p-10 bg-white border border-slate-100 rounded-[2.5rem] space-y-6">
+              <div className="p-6 sm:p-8 lg:p-10 bg-white border border-slate-100 rounded-[2.5rem] space-y-6">
                 <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">Toolkit</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button onClick={handleATSOptimize} className="p-5 bg-slate-50 rounded-2xl text-left hover:bg-slate-100 transition-all group">
@@ -321,7 +323,7 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <div className="p-10 bg-indigo-600 rounded-[2.5rem] text-white flex flex-col justify-center gap-4">
+              <div className="p-6 sm:p-8 lg:p-10 bg-indigo-600 rounded-[2.5rem] text-white flex flex-col justify-center gap-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-black uppercase tracking-widest text-indigo-200">Current Standing</h4>
                   <span className="text-[10px] font-black uppercase bg-white/20 px-3 py-1 rounded">Score: {result.score}/100</span>
@@ -369,10 +371,81 @@ export default function Home() {
               <RoadmapSection roadmap={result.executiveSummary.roadmap} />
             </div>
 
+            {/* Critical Weaknesses & Gap Analysis */}
+            <div className="space-y-8">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Critical Weaknesses</h4>
+                <div className="px-3 py-1 bg-rose-500/10 text-rose-500 rounded-full text-[8px] font-black uppercase tracking-widest border border-rose-500/20">
+                  Correction Layer Required
+                </div>
+              </div>
+              <div className="bg-white border border-slate-100 rounded-[2rem] sm:rounded-4xl p-6 sm:p-8 lg:p-10 space-y-8">
+                <div className="flex items-center gap-3 text-rose-500">
+                  <AlertTriangle size={20} />
+                  <h3 className="text-base font-bold text-slate-900 tracking-tight">Identified Narrative Gaps</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {(result.weaknesses || []).map((weakness, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="p-6 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-rose-200 transition-all"
+                    >
+                      <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                        {weakness}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Interview Intelligence */}
+            <div className="space-y-8">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Interview Intelligence</h4>
+                <div className={cn(
+                  "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border transition-all",
+                  result.isNeural
+                    ? "bg-indigo-500/10 text-indigo-500 border-indigo-500/20 shadow-[0_0_15px_-5px_rgba(99,102,241,0.4)]"
+                    : "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                )}>
+                  {result.isNeural ? (
+                    <span className="flex items-center gap-1.5"><Sparkles size={10} className="animate-pulse" /> Neural Simulation Active</span>
+                  ) : (
+                    <span className="flex items-center gap-1.5"><Zap size={10} /> Heuristic Protocol Engaged</span>
+                  )}
+                </div>
+              </div>
+              <div className="bg-slate-900 rounded-[2.5rem] p-6 sm:p-8 lg:p-10 text-white relative overflow-hidden group border border-white/5">
+                <div className="relative z-10 space-y-8">
+                  <div className="flex items-center gap-3 text-indigo-400">
+                    <HelpCircle size={20} />
+                    <h3 className="text-base font-bold text-white tracking-tight">Probable Interview Questions</h3>
+                  </div>
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
+                    {(result.interviewQuestions || []).map((question, idx) => (
+                      <motion.div
+                        key={idx}
+                        className="p-6 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-all cursor-default"
+                      >
+                        <p className="text-sm font-medium text-slate-300 leading-relaxed italic">
+                          "{question}"
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[80px] rounded-full" />
+              </div>
+            </div>
+
             {/* ATS Compliance Verdict Section */}
             <div className="space-y-8 pb-10">
               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">ATS Compliance Verdict</h4>
-              <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden group">
+              <div className="bg-slate-900 rounded-[2.5rem] p-6 sm:p-8 lg:p-10 text-white relative overflow-hidden group">
                 <div className="relative z-10 space-y-8">
                   <div className="flex items-start gap-6">
                     <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 border border-white/10">

@@ -31,6 +31,9 @@ export type AnalysisResult = {
       activeVoice: DiagnosticState;
     };
   };
+  weaknesses: string[];      // New: Identified gaps
+  interviewQuestions: string[]; // New: Preparation intelligence
+  isNeural: boolean;          // New: Indicates if AI was successfully used
   rawText: string;
 };
 
@@ -110,15 +113,15 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
           {
             "score": <Calculated score 0-100>,
             "issueCount": <Total number of things to improve>,
-            "summary": "<A balanced, professional summary of the resume's quality>",
+            "summary": "<A balanced, clinical, and data-driven summary of the resume's alignment with high-tier industry standards.>",
             "executiveSummary": {
-              "overview": "<3-5 high-impact points on how to stand out to employers.>",
+              "overview": "<3-5 hyper-specific technical insights. Focus on 'Signal Density' and how their specific stack matches or fails to match the target JD.>",
               "roadmap": [
-                { "phase": "Phase 01", "title": "Quick Fixes", "items": ["3-5 simple, actionable steps"] },
-                { "phase": "Phase 02", "title": "Main Content", "items": ["3-5 clear ways to improve experience bullets"] },
-                { "phase": "Phase 03", "title": "Professional Branding", "items": ["3-5 steps to align with modern industry standards"] }
+                { "phase": "Phase 01", "title": "Surgical Fixes", "items": ["3-5 non-generic, immediate technical changes to specific lines to align with the JD."] },
+                { "phase": "Phase 02", "title": "Narrative Expansion", "items": ["3-5 ways to rewrite project bullets to better demonstrate the 'Senior Signal' or 'Technical Ownership' the JD demands."] },
+                { "phase": "Phase 03", "title": "Strategic Branding", "items": ["3-5 high-level changes to bridge the specific gap between their current profile and the target role's seniority."] }
               ],
-              "atsVerdict": "<A clear explanation of how an employer's computer will see this resume (3-5 sentences)>",
+              "atsVerdict": "<A cold, clinical explanation of how an enterprise ATS will weight this specific resume against the JD requirements (3-5 sentences).>",
               "diagnostics": {
                 "structure": "pass | fail | partial",
                 "encoding": "pass | fail | partial",
@@ -133,7 +136,9 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
               "skills": { "title": "Skills & Keywords", "score": <0-100>, "bentoSummary": "", "strengths": [], "improvements": [], "missing": [], "status": "success|warning|error" },
               "content": { "title": "Work Impact", "score": <0-100>, "bentoSummary": "", "strengths": [], "improvements": [], "missing": [], "status": "success|warning|error" },
               "format": { "title": "Visual Layout", "score": <0-100>, "bentoSummary": "", "strengths": [], "improvements": [], "missing": [], "status": "success|warning|error" }
-            }
+            },
+            "weaknesses": ["10-15 SURGICAL weaknesses. Pinpoint exact technical mismatches, missing niche skills mentioned in the JD, and project-level narrative failures. EVERY POINT MUST BE TIED TO A SPECIFIC LINE OR LACK THEREOF IN THE RESUME. No general career advice. No fluff."],
+            "interviewQuestions": ["20 HYPER-SPECIFIC, BRUTAL interview questions. These MUST NOT be generic. They must be derived from the specific intersection of the candidate's actual projects, their technical choices (as stated in their resume), and the explicit requirements/challenges of the target Job Description. Focus on 'How' and 'Why' questions about their specific past work and how it translates to the new role. If no JD is provided, base it on the candidate's most senior-level technical claims."]
           }
           
           CRITICAL INSTRUCTIONS:
@@ -166,7 +171,7 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
           }
         }
 
-        return { ...parsed, rawText: text } as AnalysisResult;
+        return { ...parsed, isNeural: true, rawText: text, weaknesses: parsed.weaknesses || [], interviewQuestions: parsed.interviewQuestions || [] } as AnalysisResult;
       } catch (aiError) {
         console.error("AI Analysis failed, falling back to rule-based:", aiError);
       }
@@ -305,15 +310,63 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
             ]
           }
         ],
-        atsVerdict: `HEURISTIC ANALYSIS: The resume structure is likely compatible with modern parsers(85 % certainty).${keywordOverlap} ${hasMetrics ? "Quantification is present, providing a strong competitive edge." : "Warning: Lack of metrics will cause a low ranking in automated skill-filtering."} `,
+        atsVerdict: `HEURISTIC ANALYSIS: The resume structure is likely compatible with modern parsers (85% certainty). ${keywordOverlap} ${hasMetrics ? "Quantification is present, providing a strong competitive edge." : "Warning: Lack of metrics will cause a low ranking in automated skill-filtering."}`,
         diagnostics: {
           structure: sectionsScore > 80 ? "pass" : sectionsScore > 50 ? "partial" : "fail",
-          encoding: "pass", // PDF is readable by this point
+          encoding: "pass",
           keywords: keywordState,
           metrics: hasMetrics ? "pass" : "fail",
           activeVoice: foundPassive.length === 0 ? "pass" : foundPassive.length < 3 ? "partial" : "fail"
         }
       },
+      weaknesses: [
+        ...(jobDescription ? (() => {
+          // Extract some key tech words from JD that aren't in resume
+          const jdWords = jobDescription.toLowerCase().match(/\b(react|node|typescript|javascript|python|aws|docker|kubernetes|sql|testing|mentorship|leadership|agile|scrum|ci\/cd)\b/g) || [];
+          const resumeWords = text.toLowerCase();
+          const missingInResume = [...new Set(jdWords.filter(w => !resumeWords.includes(w)))];
+
+          if (missingInResume.length > 0) {
+            return [
+              `Direct signal gap for ${missingInResume.slice(0, 3).join(", ")}, which are specified as core requirements in the JD.`,
+              `No project-level evidence for ${missingInResume[0] || "key tech"} which is mentioned as a 'Must-Have' in the context provided.`,
+              `Keyword density for ${missingInResume.slice(0, 2).join("/")} is zero, likely triggering rejection from the target ATS.`
+            ];
+          }
+          return [];
+        })() : []),
+        `Impact metrics are incomplete or missing, failing to prove business value for ${techDetected[0] || "technical"} work.`,
+        foundPassive.length > 0 ? "Using passive language ('Responsible for') which makes you sound like a task-taker rather than a leader." : "Narrative focuses on 'tasks performed' rather than the 'strategic results' achieved.",
+        `Listed ${techDetected.slice(0, 2).join("/") || "skills"} without explaining complex architectural decisions made with them.`,
+        "Professional summary is generic and doesn't align with the specific high-level requirements of this role.",
+        "Lack of 'Senior Signal' markers like Mentorship, Technical Ownership, or Stakeholder Management.",
+        "Visual information density is too high; achievements are difficult for human recruiters to scan in under 6 seconds.",
+        !hasMetrics ? "Rejection Risk: Failure to quantify success is a major red flag for competitive technical roles." : "Metrics are present but not explicitly tied to the primary goals mentioned in the Job Description.",
+        "Resume lacks 'Active Voice' authority, diluting personal impact in technical reviews."
+      ].slice(0, 15),
+      interviewQuestions: [
+        `In your experience with ${techDetected[0] || "your core stack"}, walk me through a time you had to make a high-stakes trade-off between performance and maintainability.`,
+        hasMetrics ? "Your resume highlights significant impact metrics. Can you explain the specific data-collection methodology you used to ensure these numbers were accurate?" : "Since your resume lacks specific KPIs, how would you quantitatively prove the success of your most recent engineering initiative during an executive review?",
+        `If we were to deploy your ${techDetected[1] || "primary"} project to a global audience today, what is the first architectural bottleneck you would expect to hit?`,
+        "Describe a scenario where you had to debug a critical production issue that was outside of your immediate area of expertise.",
+        `How do you handle 'Technical Debt' when a product deadline is fixed and non-negotiable? Give a specific example from your PROJECTS section.`,
+        "Tell me about a time you had to lead or influence a technical decision when you weren't the most senior person in the room.",
+        `In ${techDetected[2] || "modern development"}, what's a common 'best practice' that you've purposefully broken to achieve a better outcome? Why?`,
+        "Explain a complex architectural decision from your resume as if you were talking to a non-technical Stakeholder.",
+        "How do you ensure your technical documentation remains useful and updated in a high-velocity agile environment?",
+        "Describe your process for performing a code review that focuses on long-term scalability rather than just immediate bug fixes.",
+        `If you could refactor one specific component from your most recent role, which would it be and what specific design pattern would you implement?`,
+        "How do you stay technically competitive in a landscape is evolving as fast as the current AI/Cloud ecosystem?",
+        "Tell me about a time you identified a critical security or performance flaw that everyone else on the team had overlooked.",
+        "Describe a high-pressure scenario where your technical decision was challenged by a senior peer. How did you resolve the conflict?",
+        `Beyond ${techDetected[0] || "your main skills"}, what is the next major layer of the system (Infrastructure, Security, Data) you are looking to master?`,
+        "How do you maintain deep focus and 'Flow State' in an environment with high-frequency communication like Slack or Teams?",
+        "What is the most 'elegant' piece of code or architecture you've ever designed? What made it superior to the alternatives?",
+        "How do you handle a situation where the product requirements change 48 hours before a major production deployment?",
+        "Describe a project where you had to mentor or onboard another developer into a complex codebase you owned.",
+        `What is your specific philosophy on 'Zero-Downtime' deployments for a stack like ${techDetected.slice(0, 2).join("/") || "your current one"}?`
+      ],
+      isNeural: false,
       rawText: text
     };
 

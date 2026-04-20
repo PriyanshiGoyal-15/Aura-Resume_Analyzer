@@ -22,7 +22,7 @@ export default function NarrativeSection({ content }: NarrativeSectionProps) {
   }
 
   return (
-    <div className="bg-white border border-slate-100 rounded-4xl p-10 space-y-8">
+    <div className="bg-white border border-slate-100 rounded-[2rem] sm:rounded-4xl p-6 sm:p-10 space-y-8">
       <div className="flex items-center gap-3 text-indigo-600">
         <ShieldCheck size={20} />
         <h3 className="text-base font-bold text-slate-900 tracking-tight">AI insights</h3>

@@ -18,7 +18,7 @@ export default function RoadmapSection({ roadmap }: RoadmapSectionProps) {
           transition={{ delay: idx * 0.15 }}
           className="bg-white border border-slate-100 rounded-[2rem] overflow-hidden flex flex-col h-full"
         >
-          <div className="p-8 pb-4">
+          <div className="p-6 sm:p-8 pb-4">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-2 block">
               {phase.phase}
             </span>
@@ -27,7 +27,7 @@ export default function RoadmapSection({ roadmap }: RoadmapSectionProps) {
             </h4>
           </div>
 
-          <div className="flex-1 px-8 pb-8 flex gap-6 mt-6">
+          <div className="flex-1 px-6 sm:px-8 pb-6 sm:pb-8 flex gap-4 sm:gap-6 mt-4 sm:mt-6">
             {/* Vertical Timeline Track */}
             <div className="flex flex-col items-center gap-1 shrink-0 pt-2">
               {phase.items.map((_, i) => (
