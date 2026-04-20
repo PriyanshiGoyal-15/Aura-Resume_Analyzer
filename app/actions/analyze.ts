@@ -6,7 +6,7 @@ import { withRetry } from "@/lib/ai-utils";
 
 // Function to extract text from PDF using unpdf (Vercel-safe)
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  const { text } = await extractText(buffer);
+  const { text } = await extractText(new Uint8Array(buffer));
   // unpdf returns an array of strings (one per page)
   return Array.isArray(text) ? text.join("\n") : (text || "");
 }
