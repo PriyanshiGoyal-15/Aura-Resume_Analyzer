@@ -1,48 +1,14 @@
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { extractText } from "unpdf";
 import { withRetry } from "@/lib/ai-utils";
-import path from "path";
 
-// Function to extract text from PDF using pdfjs-dist
+// Function to extract text from PDF using unpdf (Vercel-safe)
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  // Dynamically import pdfjs-dist to avoid module-level issues on Vercel
-  // Using the legacy build for better Node.js/Serverless compatibility
-  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-
-  const data = new Uint8Array(buffer);
-
-  // Set worker specifically for the environment. 
-  // We avoid 'node_modules' paths which fail on Vercel. 
-  // Instead, we let pdfjs use its built-in legacy worker if no src is set,
-  // or we catch the error to prevent a hard process crash.
-  try {
-    // Attempting to set to a static path, but with a robust fallback
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
-  } catch (e) {
-    console.warn("Could not set PDF worker path, attempting without worker:", e);
-  }
-
-  const loadingTask = pdfjs.getDocument({
-    data,
-    useWorkerFetch: false,
-    useSystemFonts: true,
-    isEvalSupported: false, // Critical for many serverless environments
-  });
-
-  const pdf = await loadingTask.promise;
-  let fullText = "";
-
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const textContent = await page.getTextContent();
-    const pageText = textContent.items
-      .map((item) => (item as { str: string }).str)
-      .join(" ");
-    fullText += pageText + "\n";
-  }
-
-  return fullText;
+  const { text } = await extractText(buffer);
+  // unpdf returns an array of strings (one per page)
+  return Array.isArray(text) ? text.join("\n") : (text || "");
 }
 
 export type AnalysisResult = {
@@ -112,19 +78,19 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
       return { success: false, error: "No file uploaded", score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
     }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-  let text = "";
-  try {
-    text = await extractTextFromPDF(buffer);
-    if (!text || text.trim().length === 0) {
-      return { success: false, error: "Parser delivered empty data. The PDF might be password-protected.", score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
+    let text = "";
+    try {
+      text = await extractTextFromPDF(buffer);
+      if (!text || text.trim().length === 0) {
+        return { success: false, error: "Parser delivered empty data. The PDF might be password-protected.", score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
+      }
+    } catch (parseErr: unknown) {
+      const error = parseErr as Error;
+      console.error("PDF Parsing Failure:", error);
+      return { success: false, error: `PARSER_FAILURE: ${error.message}`, score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
     }
-  } catch (parseErr: unknown) {
-    const error = parseErr as Error;
-    console.error("PDF Parsing Failure:", error);
-    return { success: false, error: `PARSER_FAILURE: ${error.message}`, score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" };
-  }
 
     const textLower = text.toLowerCase();
 
@@ -424,10 +390,10 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
   } catch (error: unknown) {
     console.error("Global Analysis error:", error);
     const err = error as Error;
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: `SYSTEM_CRITICAL_FAILURE: ${err.message}`,
-      score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: "" 
+      score: 0, issueCount: 0, categories: {} as any, summary: "", executiveSummary: {} as any, weaknesses: [], interviewQuestions: [], isNeural: false, rawText: ""
     };
   }
 }

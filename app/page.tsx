@@ -118,7 +118,7 @@ export default function Home() {
       formData.append("resume", file);
       formData.append("jobDescription", jobDescription);
       const output = await analyzeResume(formData);
-      
+
       if (output.success === false) {
         setModalTitle("Production Diagnostic Failure");
         setModalContent(output.error || "An internal error occurred during Neural analysis.");
