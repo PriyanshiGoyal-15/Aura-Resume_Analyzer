@@ -2,14 +2,19 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { withRetry } from "@/lib/ai-utils";
-import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import path from "path";
 
 // Function to extract text from PDF using pdfjs-dist
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  // Dynamically import pdfjs-dist to avoid module-level issues on Vercel
+  // Using the legacy build for better Node.js/Serverless compatibility
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  
   const data = new Uint8Array(buffer);
   
-  // Set worker for Node environment
+  // Set worker specifically for the environment. 
+  // On Vercel, we attempt to use the worker from the local node_modules path
+  // but wrap it in a try-catch to allow fallback if the filesystem is protected.
   try {
     const workerPath = path.join(process.cwd(), "node_modules", "pdfjs-dist", "legacy", "build", "pdf.worker.mjs");
     pdfjs.GlobalWorkerOptions.workerSrc = workerPath;
@@ -20,8 +25,8 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   const loadingTask = pdfjs.getDocument({
     data,
     useWorkerFetch: false,
-    isEvalSupported: false,
-    useSystemFonts: true
+    useSystemFonts: true,
+    isEvalSupported: false, // Critical for many serverless environments
   });
 
   const pdf = await loadingTask.promise;
@@ -102,7 +107,19 @@ export async function analyzeResume(formData: FormData): Promise<AnalysisResult>
   if (!file) throw new Error("No file uploaded");
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const text = await extractTextFromPDF(buffer);
+  
+  let text = "";
+  try {
+    text = await extractTextFromPDF(buffer);
+    if (!text || text.trim().length === 0) {
+      throw new Error("Text extraction yielded an empty data matrix.");
+    }
+  } catch (parseErr: unknown) {
+    const error = parseErr as Error;
+    console.error("PDF extraction error:", error);
+    // Returning a descriptive error that survives Next.js server-client serialization
+    throw new Error(`DIAGNOSTIC_FAILURE (PDF_PARSER): ${error.message}`);
+  }
 
   try {
     const textLower = text.toLowerCase();
